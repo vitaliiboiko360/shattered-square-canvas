@@ -30,6 +30,8 @@
     }
   };
 
+  let paths = [];
+
   function drawAnime() {
     ctx.strokeRect(sx1, sy1, w, h);
 
@@ -37,8 +39,9 @@
       const { x: x1, y: y1 } = getRandomPointOnPerim();
       // console.log(`x1 == ${x1}`);
       // console.log(`y1 == ${y1}`);
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
+      const path = new Path2D();
+
+      path.moveTo(x1, y1);
       let { x: x2, y: y2 } = getRandomPointOnPerim();
       while (x2 == x1 || y2 == y1) {
         let { x: anotherX, y: anotherY } = getRandomPointOnPerim();
@@ -47,14 +50,30 @@
       }
       // console.log(`x2 == ${x2}`);
       // console.log(`y2 == ${y2}`);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.closePath();
+      path.lineTo(x2, y2);
+      ctx.stroke(path);
+      path.closePath();
+      paths.push(path);
     };
     ctx.strokeStyle = '#00FF00';
     Array.from({ length: 20 }).forEach(() => {
       drawRandomLine();
     });
+
+    console.log(`paths == ${paths.length}`);
+    ctx.fillStyle = 'blue';
+    for (let ix = sx1; ix <= sx2; ++ix) {
+      for (let jy = sy1; jy <= sy2; ++jy) {
+        if (
+          paths.filter((path) => {
+            return ctx.isPointInStroke(path, ix, jy);
+          }).length > 1
+        ) {
+          // console.log(`isPointInStroke`);
+          ctx.fillRect(ix, jy, 1, 1);
+        }
+      }
+    }
 
     //window.requestAnimationFrame(drawAnime);
   }
