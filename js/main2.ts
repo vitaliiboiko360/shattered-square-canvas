@@ -2,7 +2,6 @@
   'use strict';
 
   let canvas: HTMLCanvasElement;
-  let button;
   let ctx: CanvasRenderingContext2D;
 
   const sx1 = 200;
@@ -156,9 +155,35 @@
   const yMid = 400;
 
   let paths: Array<Path2D> = [];
+  let colors: Array<string> = [];
+
+  class Path {
+    points: Array<Point> = [];
+    color: string = '#000';
+
+    buildPath(ctx: CanvasRenderingContext2D) {
+      if (this.points.length == 0) return;
+      const path = new Path2D();
+      path.moveTo(this.points[-1].x, this.points[-1].y);
+      ctx.save();
+      for (let point of this.points) {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(point.x, point.y, 1, 1);
+        path.lineTo(point.x, point.y);
+      }
+
+      ctx.fillStyle = this.color;
+      ctx.fill(path);
+      ctx.strokeStyle = '#00FF00';
+      ctx.stroke(path);
+      ctx.restore();
+    }
+  }
+
+  let arrayPath: Array<Path> = [];
 
   function drawAnime() {
-    ctx.strokeRect(sx1, sy1, w, h);
+    // ctx.strokeRect(sx1, sy1, w, h);
 
     // const drawRandomLine = () => {
     //   const { x: x1, y: y1 } = getRandomPointOnPerim();
@@ -239,16 +264,16 @@
     points.push(new Point(xMid, yMid));
 
     const step = 50;
-    for (let x = sx1; x < sx2; x += step) {
-      const path = new Path2D();
-      path.moveTo(x, sy1);
-      path.lineTo(x + step, sy1);
-      points.push(new Point(x + step, sy1));
-      path.lineTo(xMid, yMid);
-      path.lineTo(x, sy1);
-      ctx.stroke(path);
-      paths.push(path);
-    }
+    // for (let x = sx1; x < sx2; x += step) {
+    //   const path = new Path2D();
+    //   path.moveTo(x, sy1);
+    //   path.lineTo(x + step, sy1);
+    //   points.push(new Point(x + step, sy1));
+    //   path.lineTo(xMid, yMid);
+    //   path.lineTo(x, sy1);
+    //   ctx.stroke(path);
+    //   paths.push(path);
+    // }
 
     const buildPaths = (constantCoordinate: number, isHorizontal: boolean) => {
       const makePoint = (variedCoordinate: number) => {
@@ -265,6 +290,18 @@
       ) {
         const point = makePoint(variedCoordinate);
         const secondPoint = makePoint(variedCoordinate + step);
+
+        const aPath = new Path();
+        aPath.points.push(point);
+        aPath.points.push(secondPoint);
+        aPath.points.push(new Point(xMid, yMid));
+
+        const color = getRandomColor();
+        ctx.fillStyle = color;
+
+        aPath.color = color;
+        arrayPath.push(aPath);
+
         const path = new Path2D();
         points.push(point);
         path.moveTo(point.x, point.y);
@@ -273,6 +310,7 @@
         path.lineTo(point.x, point.y);
         ctx.stroke(path);
         paths.push(path);
+        ctx.fill(path);
       }
     };
     const horizontal = true;
@@ -342,10 +380,12 @@
       ctx.fillRect(x, y, 1, 1);
     }
 
-    for (const path of paths) {
-      ctx.fillStyle = getRandomColor();
-      ctx.fill(path);
-    }
+    // for (const path of paths) {
+    //   const color = getRandomColor();
+    //   ctx.fillStyle = color;
+    //   colors.push(color);
+    //   ctx.fill(path);
+    // }
 
     // linePoints.forEach((points, line) => {
     //   linePoints.set(
@@ -613,16 +653,34 @@
     //   }
     // };
 
-    //window.requestAnimationFrame(drawAnime);
+    //;
+  }
+  let isDone = false;
+  let halfWay = false;
+  function animateAnime() {
+    ctx.save();
+
+    ctx.restore();
+
+    if (!isDone) {
+      setTimeout(
+        () => {
+          window.requestAnimationFrame(animateAnime);
+        },
+        halfWay ? 2000 : 300
+      );
+    }
   }
 
   async function init() {
     canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    button = document.getElementById('button');
+    let create = document.getElementById('create');
+    let animate = document.getElementById('animate');
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     canvas.focus();
 
-    button!.addEventListener('click', drawAnime);
+    create!.addEventListener('click', drawAnime);
+    animate!.addEventListener('click', animateAnime);
     drawAnime();
   }
 
