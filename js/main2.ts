@@ -247,9 +247,41 @@
       path.lineTo(xMid, yMid);
       path.lineTo(x, sy1);
       ctx.stroke(path);
-      ctx.fillStyle = getRandomColor();
-      ctx.fill(path);
+      paths.push(path);
     }
+
+    const buildPaths = (constantCoordinate: number, isHorizontal: boolean) => {
+      const makePoint = (variedCoordinate: number) => {
+        if (isHorizontal) {
+          return new Point(constantCoordinate, variedCoordinate);
+        }
+        return new Point(variedCoordinate, constantCoordinate);
+      };
+      const step = 50;
+      for (
+        let variedCoordinate = 200;
+        variedCoordinate < 600;
+        variedCoordinate += step
+      ) {
+        const point = makePoint(variedCoordinate);
+        const secondPoint = makePoint(variedCoordinate + step);
+        const path = new Path2D();
+        points.push(point);
+        path.moveTo(point.x, point.y);
+        path.lineTo(secondPoint.x, secondPoint.y);
+        path.lineTo(xMid, yMid);
+        path.lineTo(point.x, point.y);
+        ctx.stroke(path);
+        paths.push(path);
+      }
+    };
+    const horizontal = true;
+    const vertical = false;
+
+    buildPaths(200, horizontal);
+    buildPaths(600, horizontal);
+    buildPaths(200, vertical);
+    buildPaths(600, vertical);
 
     ctx.fillStyle = 'red';
 
@@ -308,6 +340,11 @@
     for (const point of points) {
       const { x, y } = point;
       ctx.fillRect(x, y, 1, 1);
+    }
+
+    for (const path of paths) {
+      ctx.fillStyle = getRandomColor();
+      ctx.fill(path);
     }
 
     // linePoints.forEach((points, line) => {
