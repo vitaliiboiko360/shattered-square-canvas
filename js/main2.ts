@@ -163,8 +163,9 @@
 
     buildPath(ctx: CanvasRenderingContext2D) {
       if (this.points.length == 0) return;
+      console.log(`this.points.length = ${this.points.length}`);
       const path = new Path2D();
-      path.moveTo(this.points[-1].x, this.points[-1].y);
+      path.moveTo(this.points.at(-1)!.x, this.points.at(-1)!.y);
       ctx.save();
       for (let point of this.points) {
         ctx.fillStyle = 'red';
@@ -278,9 +279,9 @@
     const buildPaths = (constantCoordinate: number, isHorizontal: boolean) => {
       const makePoint = (variedCoordinate: number) => {
         if (isHorizontal) {
-          return new Point(constantCoordinate, variedCoordinate);
+          return new Point(variedCoordinate, constantCoordinate);
         }
-        return new Point(variedCoordinate, constantCoordinate);
+        return new Point(constantCoordinate, variedCoordinate);
       };
       const step = 50;
       for (
@@ -660,16 +661,26 @@
   function animateAnime() {
     ctx.save();
 
-    ctx.restore();
-
-    if (!isDone) {
-      setTimeout(
-        () => {
-          window.requestAnimationFrame(animateAnime);
-        },
-        halfWay ? 2000 : 300
-      );
+    for (let i = 0; i < 8; ++i) {
+      ctx.save();
+      if (i < 4) {
+        ctx.translate(-10, -10);
+      } else {
+        ctx.translate(10, -10);
+      }
+      arrayPath[i].buildPath(ctx);
+      ctx.restore();
     }
+    ctx.restore();
+    //window.requestAnimationFrame(animateAnime);
+    // if (!isDone) {
+    //   setTimeout(
+    //     () => {
+    //       window.requestAnimationFrame(animateAnime);
+    //     },
+    //     halfWay ? 2000 : 300
+    //   );
+    // }
   }
 
   async function init() {
