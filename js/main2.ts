@@ -658,29 +658,37 @@
   }
   let isDone = false;
   let halfWay = false;
-  function animateAnime() {
+  function animateAnime(
+    frame: number,
+    arrayPath: Array<Path>,
+    ctx: CanvasRenderingContext2D
+  ) {
     ctx.save();
 
     for (let i = 0; i < 8; ++i) {
-      ctx.save();
       if (i < 4) {
-        ctx.translate(-10, -10);
+        ctx.translate(-(frame * 10), -(frame * 10));
       } else {
-        ctx.translate(10, -10);
+        ctx.translate(frame * 10, -(frame * 10));
       }
       arrayPath[i].buildPath(ctx);
-      ctx.restore();
     }
     ctx.restore();
-    //window.requestAnimationFrame(animateAnime);
-    // if (!isDone) {
-    //   setTimeout(
-    //     () => {
-    //       window.requestAnimationFrame(animateAnime);
-    //     },
-    //     halfWay ? 2000 : 300
-    //   );
-    // }
+
+    if (frame == 10) {
+      isDone = true;
+    }
+    if (!isDone) {
+      window.requestAnimationFrame(() =>
+        setTimeout(
+          animateAnime,
+          halfWay ? 3000 : 1000,
+          frame + 1,
+          arrayPath,
+          ctx
+        )
+      );
+    }
   }
 
   async function init() {
@@ -691,7 +699,7 @@
     canvas.focus();
 
     create!.addEventListener('click', drawAnime);
-    animate!.addEventListener('click', animateAnime);
+    animate!.addEventListener('click', () => animateAnime(1, arrayPath, ctx));
     drawAnime();
   }
 
