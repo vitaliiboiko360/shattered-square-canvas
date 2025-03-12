@@ -663,17 +663,18 @@
     arrayPath: Array<Path>,
     ctx: CanvasRenderingContext2D
   ) {
-    ctx.save();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     for (let i = 0; i < 8; ++i) {
+      ctx.save();
       if (i < 4) {
         ctx.translate(-(frame * 10), -(frame * 10));
       } else {
         ctx.translate(frame * 10, -(frame * 10));
       }
       arrayPath[i].buildPath(ctx);
+      ctx.restore();
     }
-    ctx.restore();
 
     if (frame == 10) {
       isDone = true;
