@@ -161,6 +161,7 @@
     points: Array<Point> = [];
     color: string = '#000';
     centroid: Point | undefined;
+    angle: number | undefined;
 
     private markCentroid() {
       ctx.save();
@@ -171,7 +172,7 @@
 
     buildPath(ctx: CanvasRenderingContext2D) {
       if (this.points.length == 0) return;
-      console.log(`this.points.length = ${this.points.length}`);
+      // console.log(`this.points.length = ${this.points.length}`);
       const path = new Path2D();
       path.moveTo(this.points.at(-1)!.x, this.points.at(-1)!.y);
       ctx.save();
@@ -195,6 +196,7 @@
           this.points.reduce((yTotal, p) => p.y + yTotal, 0) /
           this.points.length;
         this.centroid = new Point(x, y);
+        this.angle = Math.atan2(yMid - y, xMid - x);
       }
       this.markCentroid();
     }
@@ -332,6 +334,14 @@
     buildPaths(600, horizontal);
     buildPaths(200, vertical);
     buildPaths(600, vertical);
+
+    for (const aPath of arrayPath) {
+      ctx.fillText(
+        aPath.angle?.toFixed(2) || '',
+        aPath.centroid!.x + 10,
+        aPath.centroid!.y + 10
+      );
+    }
 
     ctx.fillStyle = 'red';
 
