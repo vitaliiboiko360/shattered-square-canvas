@@ -162,6 +162,13 @@
     color: string = '#000';
     centroid: Point | undefined;
 
+    private markCentroid() {
+      ctx.save();
+      ctx.fillStyle = 'black';
+      ctx.fillRect(this.centroid!.x, this.centroid!.y, 2, 2);
+      ctx.restore();
+    }
+
     buildPath(ctx: CanvasRenderingContext2D) {
       if (this.points.length == 0) return;
       console.log(`this.points.length = ${this.points.length}`);
@@ -188,16 +195,8 @@
           this.points.reduce((yTotal, p) => p.y + yTotal, 0) /
           this.points.length;
         this.centroid = new Point(x, y);
-        ctx.save();
-        ctx.fillStyle = 'black';
-        ctx.fillRect(this.centroid.x, this.centroid.y, 2, 2);
-        ctx.restore();
-      } else {
-        ctx.save();
-        ctx.fillStyle = 'black';
-        ctx.fillRect(this.centroid.x, this.centroid.y, 2, 2);
-        ctx.restore();
       }
+      this.markCentroid();
     }
   }
 
