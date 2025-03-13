@@ -196,13 +196,23 @@
           this.points.reduce((yTotal, p) => p.y + yTotal, 0) /
           this.points.length;
         this.centroid = new Point(x, y);
-        this.angle = Math.atan2(yMid - y, xMid - x);
+        this.angle = Math.atan2(y - yMid, x - xMid);
       }
       this.markCentroid();
     }
   }
 
   let arrayPath: Array<Path> = [];
+
+  const getQuadrant = (angle: number | undefined) => {
+    if (angle == undefined) return 0;
+    const Pi3Over4 = (Math.PI * 3) / 4;
+    const PiOver4 = Math.PI / 4;
+    if (angle <= -PiOver4 && angle >= -Pi3Over4) return 1;
+    if (angle >= -PiOver4 && angle <= PiOver4) return 2;
+    if (angle >= PiOver4 && angle <= Pi3Over4) return 3;
+    if (angle >= Pi3Over4 || angle <= -Pi3Over4) return 4;
+  };
 
   function drawAnime() {
     // ctx.strokeRect(sx1, sy1, w, h);
@@ -335,13 +345,18 @@
     buildPaths(200, vertical);
     buildPaths(600, vertical);
 
-    for (const aPath of arrayPath) {
-      ctx.fillText(
-        aPath.angle?.toFixed(2) || '',
-        aPath.centroid!.x + 10,
-        aPath.centroid!.y + 10
-      );
-    }
+    // for (const aPath of arrayPath) {
+    //   ctx.fillText(
+    //     aPath.angle?.toFixed(2) || '',
+    //     aPath.centroid!.x + 10,
+    //     aPath.centroid!.y + 10
+    //   );
+
+    //   const quadrand = getQuadrant(aPath.angle);
+    //   let x = aPath.centroid!.x - 10;
+    //   let y = aPath.centroid!.y - 10;
+    //   ctx.fillText(quadrand?.toString() || '', x, y);
+    // }
 
     ctx.fillStyle = 'red';
 
@@ -677,6 +692,7 @@
 
     //;
   }
+
   let isDone = false;
   let halfWay = false;
   function animateAnime(
@@ -686,16 +702,27 @@
   ) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    for (let i = 0; i < 8; ++i) {
+    arrayPath.forEach((aPath, i) => {
       ctx.save();
-      if (i < 4) {
-        ctx.translate(-(frame * 10), -(frame * 10));
-      } else {
-        ctx.translate(frame * 10, -(frame * 10));
+      const side = getQuadrant(aPath.angle);
+      if (side == 1) {
+        const newY = -(frame * 10);
+        const newX = Math.tan(Math.PI / 2 + aPath.angle!) * Math.abs(newY);
+        ctx.translate(newX, newY);
       }
-      arrayPath[i].buildPath(ctx);
+      // if (side == 2) {
+      //   ctx.translate(frame * 10, frame * 10);
+      // }
+      // if (side == 3) {
+      //   ctx.translate(frame * 10, -(frame * 10));
+      // }
+      // if (side == 4) {
+      //   ctx.translate(frame * 10, frame * 10);
+      // }
+
+      aPath.buildPath(ctx);
       ctx.restore();
-    }
+    });
 
     if (frame == 10) {
       isDone = true;
@@ -704,7 +731,7 @@
       window.requestAnimationFrame(() =>
         setTimeout(
           animateAnime,
-          halfWay ? 3000 : 1000,
+          halfWay ? 3000 : 500,
           frame + 1,
           arrayPath,
           ctx
