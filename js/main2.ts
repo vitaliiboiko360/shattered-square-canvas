@@ -160,6 +160,7 @@
   class Path {
     points: Array<Point> = [];
     color: string = '#000';
+    centroid: Point | undefined;
 
     buildPath(ctx: CanvasRenderingContext2D) {
       if (this.points.length == 0) return;
@@ -178,6 +179,25 @@
       ctx.strokeStyle = '#00FF00';
       ctx.stroke(path);
       ctx.restore();
+
+      if (this.centroid == undefined) {
+        const x =
+          this.points.reduce((xTotal, p) => p.x + xTotal, 0) /
+          this.points.length;
+        const y =
+          this.points.reduce((yTotal, p) => p.y + yTotal, 0) /
+          this.points.length;
+        this.centroid = new Point(x, y);
+        ctx.save();
+        ctx.fillStyle = 'black';
+        ctx.fillRect(this.centroid.x, this.centroid.y, 2, 2);
+        ctx.restore();
+      } else {
+        ctx.save();
+        ctx.fillStyle = 'black';
+        ctx.fillRect(this.centroid.x, this.centroid.y, 2, 2);
+        ctx.restore();
+      }
     }
   }
 
@@ -276,6 +296,8 @@
     //   paths.push(path);
     // }
 
+    const midPoint = new Point(xMid, yMid);
+
     const buildPaths = (constantCoordinate: number, isHorizontal: boolean) => {
       const makePoint = (variedCoordinate: number) => {
         if (isHorizontal) {
@@ -295,23 +317,13 @@
         const aPath = new Path();
         aPath.points.push(point);
         aPath.points.push(secondPoint);
-        aPath.points.push(new Point(xMid, yMid));
-
+        aPath.points.push(midPoint);
         const color = getRandomColor();
-        ctx.fillStyle = color;
 
         aPath.color = color;
         arrayPath.push(aPath);
 
-        const path = new Path2D();
-        points.push(point);
-        path.moveTo(point.x, point.y);
-        path.lineTo(secondPoint.x, secondPoint.y);
-        path.lineTo(xMid, yMid);
-        path.lineTo(point.x, point.y);
-        ctx.stroke(path);
-        paths.push(path);
-        ctx.fill(path);
+        aPath.buildPath(ctx);
       }
     };
     const horizontal = true;
