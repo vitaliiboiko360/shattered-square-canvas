@@ -177,8 +177,8 @@
       path.moveTo(this.points.at(-1)!.x, this.points.at(-1)!.y);
       ctx.save();
       for (let point of this.points) {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(point.x, point.y, 1, 1);
+        // ctx.fillStyle = 'red';
+        // ctx.fillRect(point.x, point.y, 1, 1);
         path.lineTo(point.x, point.y);
       }
 
@@ -198,7 +198,7 @@
         this.centroid = new Point(x, y);
         this.angle = Math.atan2(y - yMid, x - xMid);
       }
-      this.markCentroid();
+      // this.markCentroid();
     }
   }
 
@@ -694,7 +694,7 @@
   }
 
   let isDone = false;
-  let halfWay = false;
+
   function animateAnime(
     frame: number,
     arrayPath: Array<Path>,
@@ -705,37 +705,48 @@
     arrayPath.forEach((aPath, i) => {
       ctx.save();
       const side = getQuadrant(aPath.angle);
+      const step = 2;
       if (side == 1) {
-        const newY = -(frame * 10);
+        const newY = -(frame * step);
         const newX = Math.tan(Math.PI / 2 + aPath.angle!) * Math.abs(newY);
         ctx.translate(newX, newY);
       }
-      // if (side == 2) {
-      //   ctx.translate(frame * 10, frame * 10);
-      // }
-      // if (side == 3) {
-      //   ctx.translate(frame * 10, -(frame * 10));
-      // }
-      // if (side == 4) {
-      //   ctx.translate(frame * 10, frame * 10);
-      // }
+      if (side == 2) {
+        const newX = frame * step;
+        const newY = Math.tan(aPath.angle!) * Math.abs(newX);
+        ctx.translate(newX, newY);
+      }
+      if (side == 3) {
+        const newY = frame * step;
+        const newX = Math.tan(Math.PI / 2 - aPath.angle!) * Math.abs(newY);
+        ctx.translate(newX, newY);
+      }
+      if (side == 4) {
+        const newX = -frame * step;
+        const newY = Math.tan(Math.PI - aPath.angle!) * Math.abs(newX);
+        ctx.translate(newX, newY);
+      }
 
       aPath.buildPath(ctx);
       ctx.restore();
     });
 
-    if (frame == 10) {
+    if (frame == 50) {
       isDone = true;
     }
-    if (!isDone) {
+    if (isDone && frame > 0) {
       window.requestAnimationFrame(() =>
         setTimeout(
           animateAnime,
-          halfWay ? 3000 : 500,
-          frame + 1,
+          frame == 50 ? 2000 : 50,
+          frame - 1,
           arrayPath,
           ctx
         )
+      );
+    } else if (!isDone) {
+      window.requestAnimationFrame(() =>
+        setTimeout(animateAnime, 50, frame + 1, arrayPath, ctx)
       );
     }
   }
@@ -748,7 +759,10 @@
     canvas.focus();
 
     create!.addEventListener('click', drawAnime);
-    animate!.addEventListener('click', () => animateAnime(1, arrayPath, ctx));
+    animate!.addEventListener('click', () => {
+      isDone = false;
+      animateAnime(1, arrayPath, ctx);
+    });
     drawAnime();
   }
 
