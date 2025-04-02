@@ -423,6 +423,7 @@
     let pointToPoints = new Map<Point, Point[]>();
 
     const addPointToPoints = (point: Point, pointsToAdd: Point[]) => {
+      if (pointsToAdd.length == 0) return;
       const pointsToUpdate = pointToPoints.get(point);
       if (pointsToUpdate == undefined) {
         pointToPoints.set(point, pointsToAdd);
