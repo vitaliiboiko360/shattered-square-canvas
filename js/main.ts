@@ -459,6 +459,18 @@
       ctx.closePath();
     };
 
+    const drawShape = (points: Point[]) {
+      const path = new Path2D();
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        const p2 = points[-points.length - (i + 1)];
+        path.moveTo(p.x, p.y);
+        path.lineTo(p2.x, p2.y);
+      }
+      path.closePath();
+      ctx.fill(path);
+    };
+
     const isEqualAngles = (angle1: number, angle2: number): boolean => {
       const precision = 0.001;
       const comp1 = Math.fround(angle1);
@@ -470,15 +482,16 @@
       return false;
     };
 
-    const followPath = (
-      point: Point,
-      points: Point[] | undefined,
-      color: string
-    ) => {
-      if (points == undefined) {
-        points = pointToPoints.get(point);
+    const isAnglesOpposite = (angle1: number, angle2: number): boolean => {
+      const precision = 0.01;
+      const comp1 = Math.fround(angle1);
+      const comp2 = Math.fround(angle2);
+
+      if (Math.abs(comp1) + Math.abs(comp2) - Math.PI <= precision) {
+        return true;
       }
-      if (point == undefined) return;
+      return false;
+    };
 
       let angleToPoint: { p: Point; angle: number }[] = [];
 
