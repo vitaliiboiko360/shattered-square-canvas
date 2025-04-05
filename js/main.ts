@@ -94,6 +94,10 @@
       if (point == undefined) return false;
       return this.x == point!.x && this.y == point!.y;
     }
+    static FromKey(key: string) {
+      const match = key.match(/point\[(\d+):(\d+)\]/);
+      return new Point(parseInt(match![1]), parseInt(match![2]));
+    }
   }
 
   class Line2 {
@@ -420,35 +424,40 @@
       );
     });
 
-    let pointToPoints = new Map<Point, Point[]>();
+    let pointToPoints = new Map<string, Point[]>();
 
     const addPointToPoints = (point: Point, pointsToAdd: Point[]) => {
       if (pointsToAdd.length == 0) return;
-      const pointsToUpdate = pointToPoints.get(point);
+      const pointsToUpdate = pointToPoints.get(point.key);
       if (pointsToUpdate == undefined) {
-        pointToPoints.set(point, pointsToAdd);
+        pointToPoints.set(point.key, pointsToAdd);
       } else {
         pointsToUpdate.push(...pointsToAdd);
-        pointToPoints.set(point, pointsToUpdate);
+        pointToPoints.set(point.key, pointsToUpdate);
       }
     };
 
     pointLines.forEach((lines, pointKey) => {
+      console.log(`<><><>POINT\n${pointKey}\n`);
       lines.forEach((line) => {
         const points = linePoints.get(line.key) || [];
-        points.forEach((point, index, array) => {
+        console.log(`${line.key}\n${points.map((p) => p.key).join(' ')}\n`);
+        for (let i = 0; i < points.length; i++) {
+          const point = points[i];
           if (point.key == pointKey) {
             const arrayOfPoints: Point[] = [];
-            if (index > 0) {
-              arrayOfPoints.push(array[index - 1]);
+            if (i > 0) {
+              arrayOfPoints.push(points[i - 1]);
             }
-            if (index < array.length - 1) {
-              arrayOfPoints.push(array[index + 1]);
+            if (i < points.length - 1) {
+              arrayOfPoints.push(points[i + 1]);
             }
+            console.log(`length of points ${arrayOfPoints.length}\n`);
             addPointToPoints(point, arrayOfPoints);
           }
-        });
+        }
       });
+      console.log(`check length save ${pointToPoints.get(pointKey)?.length}`);
     });
 
     const drawLine = (point: Point, anotherPoint: Point) => {
@@ -459,11 +468,11 @@
       ctx.closePath();
     };
 
-    const drawShape = (points: Point[]) {
+    const drawShape = (points: Point[]) => {
       const path = new Path2D();
       for (let i = 0; i < points.length; i++) {
         const p = points[i];
-        const p2 = points[-points.length - (i + 1)];
+        const p2 = points[(i + 1) % points.length];
         path.moveTo(p.x, p.y);
         path.lineTo(p2.x, p2.y);
       }
@@ -516,19 +525,22 @@
         } else if (isEqualAngles(Math.PI / 2, pointAngle.angle)) {
           ctx.strokeStyle = 'yellow';
         } else {
-          ctx.strokeStyle = color;
+          console.log(
+            `opposite 1=${angle1.angle} 2=${angle2.angle} E=${
+              Math.abs(angle1.angle) + Math.abs(angle2.angle) - Math.PI
+            }`
+          );
         }
-        drawLine(point, pointAngle.p);
-      });
+      }
     };
 
-    const usedPoints = new Set<Point>();
-
     pointToPoints.forEach((points, point) => {
-      if (usedPoints.has(point)) return;
-      usedPoints.add(point);
-      const color = getRandomColor();
-      followPath(point, points, color);
+      followPath(Point.FromKey(point), points);
+    });
+
+    let index = 0;
+    visitedPoints.forEach((count, p) => {
+      console.log(`${index++} . \t${p} ::\t ${count}`);
     });
 
     // {
