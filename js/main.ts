@@ -23,6 +23,10 @@
     const letters = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i++) {
+      if (i == 2 || i == 3) {
+        color += '0';
+        continue;
+      }
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
@@ -470,13 +474,16 @@
 
     const drawShape = (points: Point[]) => {
       const path = new Path2D();
+      const p = points[0];
+      path.moveTo(p.x, p.y);
       for (let i = 0; i < points.length; i++) {
-        const p = points[i];
+        //const p = points[i];
         const p2 = points[(i + 1) % points.length];
-        path.moveTo(p.x, p.y);
+
         path.lineTo(p2.x, p2.y);
       }
       path.closePath();
+      ctx.fillStyle = getRandomColor();
       ctx.fill(path);
     };
 
@@ -496,7 +503,7 @@
       const comp1 = Math.fround(angle1);
       const comp2 = Math.fround(angle2);
 
-      if (Math.abs(comp1) + Math.abs(comp2) - Math.PI <= precision) {
+      if (Math.abs(Math.abs(comp1 - comp2) - Math.PI) <= precision) {
         return true;
       }
       return false;
@@ -526,9 +533,17 @@
           ctx.strokeStyle = 'yellow';
         } else {
           console.log(
-            `opposite 1=${angle1.angle} 2=${angle2.angle} E=${
+            `not 1=${angle1.angle} 2=${angle2.angle} E=${
               Math.abs(angle1.angle) + Math.abs(angle2.angle) - Math.PI
             }`
+          );
+
+          drawShape([angle1.point, point, angle2.point]);
+        } else {
+          console.log(
+            `opposite 1=${angle1.angle} 2=${angle2.angle} E=${Math.abs(
+              Math.abs(angle1.angle - angle2.angle) - Math.PI
+            )}`
           );
         }
       }
@@ -541,6 +556,14 @@
     let index = 0;
     visitedPoints.forEach((count, p) => {
       console.log(`${index++} . \t${p} ::\t ${count}`);
+    });
+
+    ctx.strokeStyle = '#00FF00';
+    lines.forEach((line) => {
+      const path = new Path2D();
+      path.moveTo(line.x1, line.y1);
+      path.lineTo(line.x2, line.y2);
+      ctx.stroke(path);
     });
 
     // {
