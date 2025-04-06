@@ -19,7 +19,7 @@
   const xMid = 400;
   const yMid = 400;
 
-  function getRandomColor() {
+  function getRandomColor2() {
     const letters = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i++) {
@@ -30,6 +30,114 @@
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+  }
+
+  const colorHistory = new Set<string>();
+
+  function getRandomColor1() {
+    const getRand255 = () => ~~(Math.random() * 255);
+    const getRand65 = () => ~~(Math.random() * 65);
+    let color = '#';
+    color += getRand255().toString(16);
+    color += getRand65().toString(16);
+    color += getRand255().toString(16);
+    while (colorHistory.has(color)) {
+      color = getRandomColor();
+    }
+    colorHistory.add(color);
+    return color;
+  }
+
+  const standardColors = [
+    '#FFE4C4',
+    '#FFDEAD',
+    '#F5DEB3',
+    '#DEB887',
+    '#D2B48C',
+    '#BC8F8F',
+    '#F4A460',
+    '#DAA520',
+    '#B8860B',
+    '#CD853F',
+    '#D2691E',
+    '#8B4513',
+    '#A0522D',
+    '#A52A2A',
+    '#800000',
+    '#40E0D0',
+    '#48D1CC',
+    '#00CED1',
+    '#5F9EA0',
+    '#4682B4',
+    '#B0C4DE',
+    '#B0E0E6',
+    '#ADD8E6',
+    '#87CEEB',
+    '#87CEFA',
+    '#00BFFF',
+    '#1E90FF',
+    '#6495ED',
+    '#7B68EE',
+    '#4169E1',
+    '#0000FF',
+    '#0000CD',
+    '#00008B',
+    '#000080',
+    '#191970',
+    '#DDA0DD',
+    '#EE82EE',
+    '#DA70D6',
+    '#FF00FF',
+    '#FF00FF',
+    '#BA55D3',
+    '#9370DB',
+    '#663399',
+    '#8A2BE2',
+    '#9400D3',
+    '#9932CC',
+    '#8B008B',
+    '#800080',
+    '#4B0082',
+    '#6A5ACD',
+    '#483D8B',
+    '#7B68EE',
+    '#FFE4B5',
+    '#FFDAB9',
+    '#EEE8AA',
+    '#F0E68C',
+    '#BDB76B',
+    '#FFA07A',
+    '#FF7F50',
+    '#FF6347',
+    '#FF4500',
+    '#FF8C00',
+    '#FFA500',
+    '#FF69B4',
+    '#FF1493',
+    '#C71585',
+    '#DB7093',
+    '#B22222',
+    '#8B0000',
+    '#CD5C5C',
+    '#F08080',
+    '#FA8072',
+    '#E9967A',
+    '#FFA07A',
+    '#DC143C',
+  ];
+
+  const colorIndexHistory = new Set<number>();
+
+  function getRandomColor() {
+    let randomIndex = ~~(Math.random() * standardColors.length);
+    while (colorIndexHistory.has(randomIndex)) {
+      randomIndex = ~~(Math.random() * standardColors.length);
+    }
+    if (colorIndexHistory.size == standardColors.length - 2) {
+      colorIndexHistory.clear();
+    }
+    colorIndexHistory.add(randomIndex);
+    return standardColors[randomIndex];
   }
 
   const getRandomPointOnPerim = (): { x: number; y: number } => {
