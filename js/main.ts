@@ -510,7 +510,7 @@
     };
 
     const isAnglesOpposite = (angle1: number, angle2: number): boolean => {
-      const precision = 0.01;
+      const precision = 0.0001;
       const comp1 = Math.fround(angle1);
       const comp2 = Math.fround(angle2);
 
