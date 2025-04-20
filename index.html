@@ -11,9 +11,39 @@
       type="text/css"
     />
     <script src="js/main.js"></script>
+    <style>
+      .centerButton {
+        margin: 0 auto;
+        width: 3rem;
+      }
+      .container {
+        position: fixed;
+        display: grid;
+        grid-template-columns: 1fr 7rem 1fr;
+        bottom: 0px;
+        width: 100%;
+        /* left: 45%; */
+      }
+      .buttonsWrap {
+        grid-column: 2;
+      }
+      .canvasContainer {
+        margin-bottom: 2rem;
+      }
+    </style>
   </head>
   <body>
-    <canvas id="canvas" width="800" height="800"></canvas>
-    <button id="button">start</button>
+    <canvas
+      id="canvas"
+      class="canvasContainer"
+      width="800"
+      height="800"
+    ></canvas>
+    <div class="container">
+      <div class="buttonsWrap">
+        <button id="button" class="centerButton">start</button>
+        <button id="button" class="centerButton">reset</button>
+      </div>
+    </div>
   </body>
 </html>
