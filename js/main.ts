@@ -645,8 +645,8 @@
               Math.abs(angle1.angle) + Math.abs(angle2.angle) - Math.PI
             }`
           );
-
-          drawShape([angle1.point, point, angle2.point]);
+          pathStrokes.push({ points: [angle1.point, point, angle2.point] });
+          // drawShape([angle1.point, point, angle2.point]);
         } else {
           console.log(
             `opposite 1=${angle1.angle} 2=${angle2.angle} E=${Math.abs(
