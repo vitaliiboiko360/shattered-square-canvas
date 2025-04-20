@@ -677,6 +677,9 @@
           // );
           pathStrokes[i].points = pts.slice(0, -2);
         }
+        if (pts[first].isEqual(pts.at(last))) {
+          pathStrokes[i].points = pts.slice(0, -1);
+        }
       }
     }
 
