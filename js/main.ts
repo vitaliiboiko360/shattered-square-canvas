@@ -664,6 +664,19 @@
             removed.add(j);
           }
         }
+        const pts = pathStrokes[i].points;
+        if (
+          pts[first].isEqual(pts.at(beforeLast)) &&
+          pts[second].isEqual(pts.at(last))
+        ) {
+          // console.log(
+          //   `trimming already connected path ${pts
+          //     .slice(-2)
+          //     .map((p) => p.key)
+          //     .join(' ')}`
+          // );
+          pathStrokes[i].points = pts.slice(0, -2);
+        }
       }
     }
 
