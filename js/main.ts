@@ -19,35 +19,6 @@
   const xMid = 400;
   const yMid = 400;
 
-  function getRandomColor2() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      if (i == 2 || i == 3) {
-        color += '0';
-        continue;
-      }
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
-
-  const colorHistory = new Set<string>();
-
-  function getRandomColor1() {
-    const getRand255 = () => ~~(Math.random() * 255);
-    const getRand65 = () => ~~(Math.random() * 65);
-    let color = '#';
-    color += getRand255().toString(16);
-    color += getRand65().toString(16);
-    color += getRand255().toString(16);
-    while (colorHistory.has(color)) {
-      color = getRandomColor();
-    }
-    colorHistory.add(color);
-    return color;
-  }
-
   const standardColors = [
     '#FFE4C4',
     '#FFDEAD',
@@ -212,56 +183,6 @@
     }
   }
 
-  class Line2 {
-    p1: Point;
-    p2: Point;
-
-    private sortedPoints: Point[] | undefined = undefined;
-    private initSortedPoints() {
-      this.sortedPoints = [this.p1, this.p2].sort((a, b) => {
-        if (a.x > b.x) return 1;
-        if (a.x < b.x) return -1;
-        if (a.x == b.x) {
-          if (a.y > b.y) return 1;
-          if (a.y < b.y) return -1;
-        }
-        return 0;
-      });
-    }
-
-    constructor(x1: number, y1: number, x2: number, y2: number) {
-      this.p1 = new Point(x1, y1);
-      this.p2 = new Point(x2, y2);
-      this.initSortedPoints();
-    }
-    get key() {
-      return `line[${this.sortedPoints![0].x}:${this.sortedPoints![0].y},${
-        this.sortedPoints![1].x
-      }:${this.sortedPoints![1].y}]`;
-    }
-    isEqual(otherLine: Line2 | undefined) {
-      if (otherLine == undefined) return false;
-      return (
-        (this.p1.isEqual(otherLine.p1) && this.p2.isEqual(otherLine.p2)) ||
-        (this.p2.isEqual(otherLine.p1) && this.p1.isEqual(otherLine.p2))
-      );
-    }
-    static FromPoints(p1: Point, p2: Point) {
-      return new Line2(p1.x, p1.y, p2.x, p2.y);
-    }
-    static FromLine(line: Line) {
-      return new Line2(line.x1, line.y1, line.x2, line.y2);
-    }
-    // static fromKey(lineKey: string): Line {
-    //   const matchedNumbers = lineKey.match(/\d+/g);
-    //   let x1 = parseInt(matchedNumbers?.at(0) || '0');
-    //   let y1 = parseInt(matchedNumbers?.at(1) || '0');
-    //   let x2 = parseInt(matchedNumbers?.at(2) || '0');
-    //   let y2 = parseInt(matchedNumbers?.at(3) || '0');
-    //   return new Line(x1, y1, x2, y2);
-    // }
-  }
-
   class Path {
     points: Array<Point> = [];
     color: string = '#000';
@@ -380,7 +301,7 @@
       let { x: x2, y: y2 } = getRandomPointOnPerim();
       while (x2 == x1 || y2 == y1) {
         let { x: anotherX, y: anotherY } = getRandomPointOnPerim();
-        console.log(`need another x2== ${x2} y2== ${y2}`);
+        // console.log(`need another x2== ${x2} y2== ${y2}`);
         x2 = anotherX;
         y2 = anotherY;
       }
@@ -421,7 +342,7 @@
         fillText(`x:${p1.x}`, x0!, y0!);
         fillText(`y:${p1.y}`, x0!, y01!);
 
-        console.log(`p1 ${p1.key} atan2 ${angle} \n atan`);
+        // console.log(`p1 ${p1.key} atan2 ${angle} \n atan`);
       }
 
       const l1 = new Line(x1, y1, x2, y2);
@@ -434,7 +355,7 @@
       addToPointLines(p2, l1);
     };
 
-    Array.from({ length: 15 }).forEach(() => {
+    Array.from({ length: 25 }).forEach(() => {
       drawRandomLine();
     });
 
@@ -443,13 +364,8 @@
     for (const line of lines) {
       for (const aLine of lines) {
         if (aLine == line) {
-          // console.log(`we hit the same line`);
           continue;
         }
-        // console.log(JSON.stringify(aLine));
-        // console.log(JSON.stringify(line));
-        // console.log(`aLine == ${aLine.x1} ${aLine.y1} ${aLine.x2} ${aLine.y}`);
-        // console.log(`line == ${line.x1} ${line.y1} ${line.x2} ${line.y}`);
         const denom =
           (aLine.x2 - aLine.x1) * (line.y2 - line.y1) -
           (aLine.y2 - aLine.y1) * (line.x2 - line.x1);
@@ -466,21 +382,12 @@
           const a = alpha / denom;
           const b = beta / denom;
 
-          // console.log(`denom ==${denom}`);
-          // console.log(`alpha == ${a}  beta == ${a}`);
-          // console.log(`\n\n`);
-
           if (a < 0 || a > 1 || b < 0 || b > 1) {
-            // console.log(`\n\na=${a}\tb=${b}\n\n`);
             continue;
           }
 
-          // const dx = a * (line.x2 - line.x1);
-          // const dy = a * (line.y2 - line.y1);
-          // console.log(`dx == ${dx} dy == ${dy}`);
           const x0 = line.x1 + a * (line.x2 - line.x1);
           const y0 = line.y1 + a * (line.y2 - line.y1);
-          // console.log(`x == ${x0} y == ${y0}`);
 
           const p: Point = new Point(Math.round(x0), Math.round(y0));
           points.push(p);
@@ -550,10 +457,10 @@
     };
 
     pointLines.forEach((lines, pointKey) => {
-      console.log(`<><><>POINT\n${pointKey}\n`);
+      // console.log(`<><><>POINT\n${pointKey}\n`);
       lines.forEach((line) => {
         const points = linePoints.get(line.key) || [];
-        console.log(`${line.key}\n${points.map((p) => p.key).join(' ')}\n`);
+        // console.log(`${line.key}\n${points.map((p) => p.key).join(' ')}\n`);
         for (let i = 0; i < points.length; i++) {
           const point = points[i];
           if (point.key == pointKey) {
@@ -564,12 +471,12 @@
             if (i < points.length - 1) {
               arrayOfPoints.push(points[i + 1]);
             }
-            console.log(`length of points ${arrayOfPoints.length}\n`);
+            // console.log(`length of points ${arrayOfPoints.length}\n`);
             addPointToPoints(point, arrayOfPoints);
           }
         }
       });
-      console.log(`check length save ${pointToPoints.get(pointKey)?.length}`);
+      // console.log(`check length save ${pointToPoints.get(pointKey)?.length}`);
     });
 
     const drawLine = (point: Point, anotherPoint: Point) => {
@@ -593,17 +500,13 @@
       path.closePath();
       ctx.fillStyle = getRandomColor();
       ctx.fill(path);
-    };
 
-    const isEqualAngles = (angle1: number, angle2: number): boolean => {
-      const precision = 0.001;
-      const comp1 = Math.fround(angle1);
-      const comp2 = Math.fround(angle2);
-
-      if (Math.abs(comp1 - comp2) <= precision) {
-        return true;
-      }
-      return false;
+      const x = points.reduce((xTotal, p) => p.x + xTotal, 0) / points.length;
+      const y = points.reduce((yTotal, p) => p.y + yTotal, 0) / points.length;
+      ctx.save();
+      ctx.fillStyle = '#00FF00';
+      ctx.fillRect(x, y, 2, 2);
+      ctx.restore();
     };
 
     const isAnglesOpposite = (angle1: number, angle2: number): boolean => {
@@ -617,42 +520,63 @@
       return false;
     };
 
-      let angleToPoint: { p: Point; angle: number }[] = [];
+    const visitedPoints = new Map<string, number>();
 
-      angleToPoint = points!
-        .filter((p) => !p.isEqual(point))
-        .map((p) => {
-          usedPoints.add(p);
-          let angle = Math.atan2(point.y - p.y, point.x - p.x);
-          if (angle < 0) {
-            angle = Math.PI * 2 + angle;
-          }
-          return { p: p, angle: angle };
-        });
+    const pathStrokes: Array<{ points: Point[] }> = [];
 
-      angleToPoint.forEach((pointAngle) => {
-        if (isEqualAngles(Math.PI, pointAngle.angle)) {
-          ctx.strokeStyle = 'green';
-        } else if (isEqualAngles(0, pointAngle.angle)) {
-          ctx.strokeStyle = 'blue';
-        } else if (isEqualAngles((Math.PI * 3) / 2, pointAngle.angle)) {
-          ctx.strokeStyle = 'red';
-        } else if (isEqualAngles(Math.PI / 2, pointAngle.angle)) {
-          ctx.strokeStyle = 'yellow';
-        } else {
-          console.log(
-            `not 1=${angle1.angle} 2=${angle2.angle} E=${
-              Math.abs(angle1.angle) + Math.abs(angle2.angle) - Math.PI
-            }`
-          );
+    const followPath = (point: Point, points: Point[]) => {
+      const color = getRandomColor();
+
+      visitedPoints.set(point.key, points.length);
+
+      const angles = points.map((p) => {
+        let angle = Math.atan2(point.y - p.y, point.x - p.x);
+        if (angle < 0) {
+          angle = Math.PI * 2 + angle;
+        }
+        return { angle: angle, point: p };
+      });
+
+      angles.sort((a, b) => {
+        if (a.angle > b.angle) return -1;
+        if (a.angle < b.angle) return 1;
+        return 0;
+      });
+
+      for (let i = 0; i < points.length; ++i) {
+        const p = points[i];
+        ctx.strokeStyle = color;
+        drawLine(point, p);
+      }
+
+      // console.log(`\n\n>>>>> POINT ${point.key}\n`);
+      angles.forEach((angle, index) => {
+        // console.log(`i=${index} a= ${angle.angle}`);
+      });
+      // console.log('\n');
+      for (let i = 0; i < angles.length; i++) {
+        const angle1 = angles[i];
+
+        const angle2 = angles[(i + 1) % angles.length];
+
+        if (i == angles.length - 1 && angles.length < 3) {
+          continue;
+        }
+
+        if (!isAnglesOpposite(angle1.angle, angle2.angle)) {
+          // console.log(
+          //   `not 1=${angle1.angle} 2=${angle2.angle} E=${
+          //     Math.abs(angle1.angle) + Math.abs(angle2.angle) - Math.PI
+          //   }`
+          // );
           pathStrokes.push({ points: [angle1.point, point, angle2.point] });
           // drawShape([angle1.point, point, angle2.point]);
         } else {
-          console.log(
-            `opposite 1=${angle1.angle} 2=${angle2.angle} E=${Math.abs(
-              Math.abs(angle1.angle - angle2.angle) - Math.PI
-            )}`
-          );
+          // console.log(
+          //   `opposite 1=${angle1.angle} 2=${angle2.angle} E=${Math.abs(
+          //     Math.abs(angle1.angle - angle2.angle) - Math.PI
+          //   )}`
+          // );
         }
       }
     };
@@ -661,10 +585,117 @@
       followPath(Point.FromKey(point), points);
     });
 
-    let index = 0;
-    visitedPoints.forEach((count, p) => {
-      console.log(`${index++} . \t${p} ::\t ${count}`);
-    });
+    const first = 0;
+    const second = 1;
+    const third = 2;
+    const last = -1;
+    const beforeLast = -2;
+    const oneBeforeLast = -3;
+
+    const removed = new Set<number>();
+
+    // get determinant of
+    const getD = (p1: Point, p2: Point, p3: Point) => {
+      return (p3.x - p1.x) * (p2.y - p1.y) - (p3.y - p1.y) * (p2.x - p1.x);
+    };
+
+    console.log(`\n\n number of path storkes = ${pathStrokes.length}`);
+
+    for (let i = 0; i < pathStrokes.length; i++) {
+      if (removed.has(i)) {
+        continue;
+      }
+      const A0 = pathStrokes[i].points[first];
+      const A1 = pathStrokes[i].points[second];
+      const A2 = pathStrokes[i].points[third];
+      const B0 = pathStrokes[i].points.at(last);
+      const B1 = pathStrokes[i].points.at(beforeLast);
+      const B2 = pathStrokes[i].points.at(oneBeforeLast);
+      for (let j = 0; j < pathStrokes.length; j++) {
+        if (i == j || removed.has(j)) continue;
+
+        const cA0 = pathStrokes[j].points[first];
+        const cA1 = pathStrokes[j].points[second];
+        const cA2 = pathStrokes[j].points[third];
+        const cB0 = pathStrokes[j].points.at(last);
+        const cB1 = pathStrokes[j].points.at(beforeLast);
+        const cB2 = pathStrokes[j].points.at(oneBeforeLast);
+
+        if (cA0.isEqual(A1) && cA1.isEqual(A0)) {
+          if (
+            (getD(A0, A1, A2) > 0 && getD(cA0, cA1, cA2) < 0) ||
+            (getD(A0, A1, A2) < 0 && getD(cA0, cA1, cA2) > 0)
+          ) {
+            const temp = pathStrokes[j].points.slice(2).reverse();
+            const newPoints = temp.concat(pathStrokes[i].points);
+            pathStrokes[i].points = newPoints;
+            removed.add(j);
+          }
+        } else if (cA0.isEqual(B1) && cA1.isEqual(B0)) {
+          if (
+            (getD(B0!, B1!, B2!) > 0 && getD(cA0, cA1, cA2) < 0) ||
+            (getD(B0!, B1!, B2!) < 0 && getD(cA0, cA1, cA2) > 0)
+          ) {
+            // if (pathStrokes[j].points.length > 3) {
+            //   // console.log(`candidate has more than 3 points`);
+            // } else pathStrokes[i].points.push(cA2);
+            // // pathStrokes[i].legB = pathStrokes[j].legA;
+            pathStrokes[i].points.push(...pathStrokes[j].points.slice(2));
+            removed.add(j);
+          }
+        } else if (cB0.isEqual(A1) && cB1.isEqual(A0)) {
+          if (
+            (getD(A0, A1, A2) < 0 && getD(cB0, cB1, cB2) > 0) ||
+            (getD(A0, A1, A2) > 0 && getD(cB0, cB1, cB2) < 0)
+          ) {
+            const newPoints = pathStrokes[j].points.slice(0, -2);
+            newPoints.push(...pathStrokes[i].points);
+            pathStrokes[i].points = newPoints;
+            removed.add(j);
+          }
+        } else if (cB0.isEqual(B1) && cB1.isEqual(B0)) {
+          if (
+            (getD(B0, B1, B2) > 0 && getD(cB0, cB1, cB2) < 0) ||
+            (getD(B0, B1, B2) < 0 && getD(cB0, cB1, cB2) > 0)
+          ) {
+            pathStrokes[i].points.push(
+              ...pathStrokes[j].points.reverse().slice(2)
+            );
+            removed.add(j);
+          }
+        }
+      }
+    }
+
+    console.log(`\n\nchecking duplicate points:\n`);
+
+    for (let i = 0; i < pathStrokes.length; i++) {
+      if (removed.has(i)) continue;
+      const pS = pathStrokes[i];
+      let duplicatesFound = 0;
+      if (
+        (duplicatesFound = pS.points
+          .toSorted((a: Point, b: Point) => {
+            if (a.y > b.y) return 1;
+            if (a.y < b.y) return -1;
+            if (a.y == b.y) {
+              if (a.x > b.x) return 1;
+              if (a.x < b.x) return -1;
+            }
+            return 0;
+          })
+          .filter((p, i, a) => {
+            if (i == 0) return false;
+            return p.isEqual(a[i - 1]);
+          }).length) > 0
+      ) {
+        console.log(
+          `found dups=${duplicatesFound} `,
+          pS.points.map((p) => p.key).join(' ')
+        );
+      }
+      drawShape(pS.points);
+    }
 
     ctx.strokeStyle = '#00FF00';
     lines.forEach((line) => {
@@ -673,226 +704,6 @@
       path.lineTo(line.x2, line.y2);
       ctx.stroke(path);
     });
-
-    // {
-    //   const notPerimLine = (l: Line) =>
-    //     !l.isEqual(l1) && !l.isEqual(l2) && !l.isEqual(l3) && !l.isEqual(l4);
-
-    //   console.log(`linePoints.size ${linePoints.size}`);
-
-    //   // linePoints.forEach((points, lineKey) => {
-    //   //   const line = Line.fromKey(lineKey);
-    //   //   if (!notPerimLine(line)) {
-    //   //     return;
-    //   //   }
-    //   //   console.log(`\n\n${lineKey}\n`);
-    //   //   let i = 0;
-    //   //   for (const point of points) {
-    //   //     if (i >= points.length - 1) continue;
-    //   //     const pointA = point;
-    //   //     const pointB = points[++i];
-
-    //   //     const pointsForA =
-    //   //       pointLines
-    //   //         .get(pointA.key)
-    //   //         ?.filter((l) => {
-    //   //           if (!line.isEqual(l) && l) console.log(`A ${l?.key}`);
-    //   //           return !line.isEqual(l) && l;
-    //   //         })
-    //   //         ?.flatMap((l) => {
-    //   //           console.log(
-    //   //             linePoints
-    //   //               .get(l.key)
-    //   //               ?.map((p) => p.key)
-    //   //               ?.join(' ')
-    //   //           );
-    //   //           let points = (
-    //   //             linePoints.get(l.key) as Array<Point | undefined>
-    //   //           ).slice();
-    //   //           points?.unshift(undefined);
-    //   //           points?.push(undefined);
-    //   //           return points;
-    //   //         })
-    //   //         ?.reduce((result, p, i, a) => {
-    //   //           if (p?.isEqual(pointA)) {
-    //   //             let pair = [a[i - 1], a[i + 1]];
-    //   //             console.log(
-    //   //               'pair:\t' + pair.map((p) => p?.key || 'undef').join(' ')
-    //   //             );
-    //   //             result.push(pair);
-    //   //           }
-    //   //           return result;
-    //   //         }, [] as Array<Array<Point | undefined>>) || [];
-    //   //     const pointsForB =
-    //   //       pointLines
-    //   //         .get(pointB.key)
-    //   //         ?.filter((l) => {
-    //   //           if (!line.isEqual(l) && l) console.log(`B ${l.key}`);
-    //   //           return !line.isEqual(l) && l;
-    //   //         })
-    //   //         ?.flatMap((l) => {
-    //   //           console.log(
-    //   //             linePoints
-    //   //               .get(l.key)
-    //   //               ?.map((p) => p.key)
-    //   //               ?.join(' ')
-    //   //           );
-    //   //           let points = (
-    //   //             linePoints.get(l.key) as Array<Point | undefined>
-    //   //           ).slice();
-    //   //           points?.unshift(undefined);
-    //   //           points?.push(undefined);
-    //   //           return points;
-    //   //         })
-    //   //         ?.reduce((result, p, i, a) => {
-    //   //           if (p?.isEqual(pointB)) {
-    //   //             let pair = [a[i - 1], a[i + 1]];
-    //   //             console.log(
-    //   //               'pair:\t' + pair.map((p) => p?.key || 'undef').join(' ')
-    //   //             );
-    //   //             result.push(pair);
-    //   //           }
-    //   //           return result;
-    //   //         }, [] as Array<Array<Point | undefined>>) || [];
-
-    //   //     const outputAtan2 = (
-    //   //       str: string,
-    //   //       point: Point,
-    //   //       points: Array<Array<Point | undefined>>
-    //   //     ) => {
-    //   //       points.forEach((pair, index) => {
-    //   //         if (pair[0]) {
-    //   //           console.log(
-    //   //             `${str} ${index + 1} : 0 :\t${Math.atan2(
-    //   //               point.y - pair[0].y,
-    //   //               point.x - pair[0].x
-    //   //             )}`
-    //   //           );
-    //   //         }
-    //   //         if (pair[1]) {
-    //   //           console.log(
-    //   //             `${str} ${index + 1} : 1 :\t${Math.atan2(
-    //   //               point.y - pair[1].y,
-    //   //               point.x - pair[1].x
-    //   //             )}`
-    //   //           );
-    //   //         }
-    //   //       });
-    //   //     };
-
-    //   //     console.log(
-    //   //       ` atan p1-p2 : ${Math.atan2(
-    //   //         pointA.x - pointB.x,
-    //   //         pointA.y - pointB.y
-    //   //       )}`
-    //   //     );
-    //   //     console.log(
-    //   //       ` atan p2-p1 : ${Math.atan2(
-    //   //         pointB.x - pointA.x,
-    //   //         pointB.y - pointA.y
-    //   //       )}`
-    //   //     );
-    //   //     outputAtan2('a->b', pointA, pointsForB);
-    //   //     outputAtan2('b->a', pointB, pointsForA);
-    //   //   }
-    //   // });
-
-    //   const buildPath = (p1: Point, p2: Point, p3: Point | undefined) => {
-    //     const points: Point[] = [];
-    //     points.push(p1);
-    //     if (p3) points.push(p3);
-    //     points.push(p2);
-
-    //     const line1 = pointLines.get(p1.key)?.find(notPerimLine);
-    //     const line2 = pointLines.get(p2.key)?.find(notPerimLine);
-    //   };
-
-    //   for (const point of points) {
-    //     const linesCrossed = pointLines.get(point.key);
-    //   }
-    // }
-
-    // {
-    //   console.log(
-    //     `first line l1 points == ${JSON.stringify(linePoints.get(l1.key))}`
-    //   );
-
-    //   const getLeftPoint = (point: Point, line: Line) => {
-    //     const points = linePoints.get(line.key);
-    //     //console.log(`points == ${JSON.stringify(linePoints.get(line.key))}`);
-
-    //     const index = (points || []).findIndex((p) => p.isEqual(point));
-    //     if (index == -1) {
-    //       // console.log(`undefined: index of point == ${index}`);
-    //       return undefined;
-    //     }
-
-    //     if (index > 0) {
-    //       return points![index - 1];
-    //     }
-
-    //     return undefined;
-    //   };
-
-    //   const getRightPoint = (point: Point, line: Line) => {
-    //     const points = linePoints.get(line.key);
-    //     //console.log(`points == ${JSON.stringify(linePoints.get(line.key))}`);
-
-    //     const index = (points || []).findIndex((p) => p.isEqual(point));
-    //     if (index == -1) {
-    //       // console.log(`undefined: index of point == ${index}`);
-    //       return undefined;
-    //     }
-
-    //     if (index < points!.length - 1) {
-    //       return points![index + 1];
-    //     }
-
-    //     return undefined;
-    //   };
-
-    //   let traversePath: Function;
-    //   traversePath = (
-    //     currentPoint: Point,
-    //     currentLine: Line,
-    //     visitedPoints: Point[]
-    //   ) => {
-    //     if (visitedPoints.slice(1).find((p) => p.isEqual(currentPoint))) {
-    //       console.log(
-    //         `we encountered visited point of the In-progress path building`,
-    //         `\npoint = ${currentPoint.key}`
-    //       );
-    //       return;
-    //     }
-    //     const linesCrossed = pointLines.get(currentPoint.key) || [];
-    //     const nextRightPoint = getRightPoint(currentPoint, currentLine);
-    //     const nextLeftPoint = getLeftPoint(currentPoint, currentLine);
-
-    //     if (currentPoint.isEqual(visitedPoints.at(0))) {
-    //       const path = new Path2D();
-    //       visitedPoints.forEach((p, i, a) => {
-    //         path.moveTo(p.x, p.y);
-    //         if (i < a.length - 1) {
-    //           path.lineTo(a[i + 1].x, a[i + 1].y);
-    //         }
-    //       });
-    //       path.closePath();
-    //       ctx.fillStyle = getRandomColor();
-    //       ctx.fill(path);
-    //       ctx.stroke(path);
-    //       console.log(`we build the path - check it`);
-    //       return;
-    //     } else {
-    //       visitedPoints.push(currentPoint);
-    //       if (nextLeftPoint) {
-    //         const linesCrossed = pointLines.get(nextLeftPoint.key) || [];
-    //         const nextLine = linesCrossed.find((l) => !l.isEqual(currentLine));
-    //         console.log(`next Line == ${nextLine?.key}`);
-    //         traversePath(nextLeftPoint, nextLine, visitedPoints);
-    //       }
-    //     }
-    //   };
-    // }
   }
 
   async function init() {
