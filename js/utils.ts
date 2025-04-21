@@ -37,3 +37,24 @@ const isEqualAngles = (angle1: number, angle2: number): boolean => {
   }
   return false;
 };
+
+const redColors = [
+  '#7B68EE',
+  '#FFE4B5',
+  '#FFDAB9',
+  '#EEE8AA',
+  '#F0E68C',
+  '#BDB76B',
+  '#FFA07A',
+  '#FF7F50',
+  '#FF6347',
+  '#FF4500',
+  '#FF8C00',
+  '#FFA500',
+  '#FF69B4',
+  '#FF1493',
+];
+
+function getRedColor() {
+  return redColors[~~(Math.random() * redColors.length)];
+}
