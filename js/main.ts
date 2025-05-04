@@ -709,6 +709,13 @@
           `found dups=${duplicatesFound} `,
           pS.points.map((p) => p.key).join(' ')
         );
+        const redColor = getRedColor();
+        pS.points.forEach((p) => {
+          ctx.save();
+          ctx.fillStyle = redColor;
+          ctx.fillRect(p.x, p.y, 3, 3);
+          ctx.restore();
+        });
       }
       drawShape(pS.points);
     }
