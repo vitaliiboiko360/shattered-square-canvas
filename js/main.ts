@@ -676,12 +676,19 @@
           //     .join(' ')}`
           // );
           pathStrokes[i].points = pts.slice(0, -2);
-        }
-        if (pts[first].isEqual(pts.at(last))) {
-          pathStrokes[i].points = pts.slice(0, -1);
+        } else if (pts.length > 3 && pts[first].isEqual(pts.at(last))) {
+          //pathStrokes[i].points = pts.slice(0, -1);
         }
       }
     }
+
+    ctx.strokeStyle = '#00FF00';
+    lines.forEach((line) => {
+      const path = new Path2D();
+      path.moveTo(line.x1, line.y1);
+      path.lineTo(line.x2, line.y2);
+      ctx.stroke(path);
+    });
 
     console.log(`\n\nchecking duplicate points:\n`);
 
@@ -689,6 +696,7 @@
       if (removed.has(i)) continue;
       const pS = pathStrokes[i];
       let duplicatesFound = 0;
+      drawShape(pS.points);
       if (
         (duplicatesFound = pS.points
           .toSorted((a: Point, b: Point) => {
@@ -710,14 +718,30 @@
           pS.points.map((p) => p.key).join(' ')
         );
         const redColor = getRedColor();
-        pS.points.forEach((p) => {
+        pS.points.forEach((p, i, a) => {
           ctx.save();
           ctx.fillStyle = redColor;
           ctx.fillRect(p.x, p.y, 3, 3);
+          if (i + 1 < a.length) {
+            ctx.strokeStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(a[i + 1].x, a[i + 1].y);
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.closePath();
+          } else {
+            ctx.strokeStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(a[0].x, a[0].y);
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.closePath();
+          }
           ctx.restore();
         });
       }
-      drawShape(pS.points);
     }
 
     ctx.strokeStyle = '#00FF00';
